@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { NavLink, Link } from 'react-router-dom';
+import { NavLink, Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import {
   FiMenu,
   FiX,
@@ -7,6 +8,7 @@ import {
   FiHome,
   FiBookOpen,
   FiClipboard,
+  FiLogOut,
 } from 'react-icons/fi';
 
 const linkBase =
@@ -20,8 +22,14 @@ function navClass(isActive: boolean) {
 
 export default function NavBar() {
   const [open, setOpen] = useState(false);
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   const close = () => setOpen(false);
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   return (
     <header className='sticky top-0 z-40 bg-white/80 backdrop-blur shadow-sm'>
@@ -47,6 +55,15 @@ export default function NavBar() {
             <FiClipboard aria-hidden /> Moje prijave
           </NavLink>
         </nav>
+
+        {user && (
+          <button
+            onClick={handleLogout}
+            className='hidden md:inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100'
+          >
+            <FiLogOut /> Logout
+          </button>
+        )}
 
         <button
           type='button'
@@ -84,6 +101,18 @@ export default function NavBar() {
             >
               <FiClipboard aria-hidden /> Moje prijave
             </NavLink>
+
+            {user && (
+              <button
+                onClick={() => {
+                  close();
+                  handleLogout();
+                }}
+                className='inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100'
+              >
+                <FiLogOut /> Logout
+              </button>
+            )}
           </nav>
         </div>
       )}
