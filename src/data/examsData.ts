@@ -129,8 +129,11 @@ function generateTerms(exams: Exam[], sessions: ExamSession[]): ExamTerm[] {
     exams.forEach((exam, idx) => {
       const day = new Date(start);
       day.setDate(start.getDate() + (idx % 7));
-      const startsAt = toISODateTime(day.toISOString().slice(0, 10), '10:00');
-      const endsAt = toISODateTime(day.toISOString().slice(0, 10), '12:00');
+      const startsAt = toISODateTime(
+        day.toISOString().slice(0, 10),
+        '10:00:00'
+      );
+      const endsAt = toISODateTime(day.toISOString().slice(0, 10), '12:00:00');
 
       terms.push({
         id: `${exam.id}-${s.id}`,
