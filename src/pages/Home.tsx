@@ -1,9 +1,43 @@
-import { useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { examService } from '../services/examService';
 
+type Holiday = {
+  date: string;
+  localName: string;
+  name: string;
+  countryCode: string;
+};
+
 export default function Home() {
   const data = useMemo(() => examService.getData(), []);
+  const [holidays, setHolidays] = useState<Holiday[]>([]);
+  const [loadingH, setLoadingH] = useState(true);
+  const [errorH, setErrorH] = useState<string | null>(null);
+
+  useEffect(() => {
+    const year = new Date().getFullYear();
+    fetch(`https://date.nager.at/api/v3/PublicHolidays/${year}/RS`)
+      .then((resp) => {
+        if (!resp.ok) throw new Error('Greška pri učitavanju praznika');
+        return resp.json();
+      })
+      .then((data: any[]) => {
+        const hs = data.map((h) => ({
+          date: h.date,
+          localName: h.localName || h.name,
+          name: h.name,
+          countryCode: h.countryCode || 'RS',
+        }));
+        setHolidays(hs);
+        setLoadingH(false);
+      })
+      .catch((err) => {
+        console.error('Holiday fetch error:', err);
+        setErrorH('Ne mogu da učitam praznike');
+        setLoadingH(false);
+      });
+  }, []);
 
   return (
     <section className='space-y-8'>
@@ -58,6 +92,28 @@ export default function Home() {
             </div>
           ))}
         </div>
+      </div>
+
+      <div>
+        <h2 className='mb-3 text-xl font-semibold'>Neradni dani (Praznici)</h2>
+        {loadingH && (
+          <p className='text-sm text-gray-500'>Učitavanje praznika...</p>
+        )}
+        {errorH && <p className='text-sm text-red-600'>{errorH}</p>}
+        {!loadingH && !errorH && holidays.length === 0 && (
+          <p className='text-sm text-gray-500'>
+            Nema praznika pronađenih za ovu godinu.
+          </p>
+        )}
+        {!loadingH && !errorH && holidays.length > 0 && (
+          <ul className='space-y-1 text-sm text-gray-700'>
+            {holidays.map((h) => (
+              <li key={h.date} className='flex items-center gap-2'>
+                <span className='font-medium'>{h.date}:</span> {h.localName}
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </section>
   );
