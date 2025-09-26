@@ -14,7 +14,7 @@ export default function Exams() {
   const now = new Date();
 
   return (
-    <div className='min-h-dvh bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-6'>
+    <div>
       <div className='mx-auto w-full max-w-5xl px-4'>
         <h1 className='mb-4 text-2xl font-semibold'>Ispiti</h1>
 
